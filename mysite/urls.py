@@ -55,22 +55,22 @@ def AUTOENCODER(request):
     if request.method == 'POST':
         name = request.POST.get('username')
         image = request.FILES.get('avatar')
-        # img = Image.open(image)
-        # img = img.resize((440, 440))
-        # imgnp = np.array(img)
-        # imgnp =imgnp / 255.0
-        #
-        # model_file = "./model/autoEncoder_dense.pkl"
-        # net_dict = torch.load(model_file, map_location=torch.device('cpu'))
-        # net = net_2()
-        # net.load_state_dict(net_dict)
-        # imgnp = torch.from_numpy(imgnp.transpose((2, 0, 1)))
-        # imgnp = torch.unsqueeze(imgnp, dim=0)
-        # y_pred = net(imgnp.to(torch.float32))
-        # print(torch.max(y_pred, dim=1))
-        # y_pred = torch.max(y_pred, dim=1).indices
-        # result = {"probability": y_pred.numpy().item()}
-        result = {"probability":'1'}
+        img = Image.open(image)
+        img = img.resize((440, 440))
+        imgnp = np.array(img)
+        imgnp =imgnp / 255.0
+
+        model_file = "./model/autoEncoder_dense.pkl"
+        net_dict = torch.load(model_file, map_location=torch.device('cpu'))
+        net = net_2()
+        net.load_state_dict(net_dict)
+        imgnp = torch.from_numpy(imgnp.transpose((2, 0, 1)))
+        imgnp = torch.unsqueeze(imgnp, dim=0)
+        y_pred = net(imgnp.to(torch.float32))
+        print(torch.max(y_pred, dim=1))
+        y_pred = torch.max(y_pred, dim=1).indices
+        result = {"probability": y_pred.numpy().item()}
+        result = {"probability":result}
         return HttpResponse(json.dumps(result), content_type="application/json")
 
 
@@ -88,8 +88,16 @@ def upload(request):
         return HttpResponse('ok')
     return render(request, 'upload.html')
 
+def Performance(requset):
+    result = {
+        'pca': 0.54,
+        'autoencoder':0.90,
+        'kmeans':0.64
+    }
+
+    return HttpResponse(json.dumps(result), content_type="application/json")
 urlpatterns = [
     path('pca', AUTOENCODER),
     path('autoencoder', AUTOENCODER),
-    path('upload', upload)
+    path('performance', Performance)
 ]
